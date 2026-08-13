@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John's Gazebos | Luxury Outdoor Kitchen Gazebos | AR Preview</title>
+<meta name="description" content="Experience John's Gazebos luxury outdoor kitchen gazebo in AR. 13ft x 15ft timber frame with pizza oven, gas grill, and granite countertops.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--gold:#C8956C;--gold-light:#E8C5A0;--dark:#1A1A1A;--darker:#111;
+--cream:#FAF5EF;--white:#FFF;--gray:#6B7280;--light-gray:#F3F4F6;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--dark);overflow-x:hidden;background:var(--white)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--darker);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s}
+#loader.hidden{opacity:0;pointer-events:none}
+#loader .logo-text{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);margin-bottom:1.5rem;letter-spacing:.05em}
+#loader .bar-wrap{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+#loader .bar{width:0;height:100%;background:var(--gold);border-radius:2px;transition:width .3s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s}
+nav.scrolled{background:rgba(26,26,26,.95);backdrop-filter:blur(12px);box-shadow:0 2px 20px rgba(0,0,0,.15)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white);font-weight:700;text-decoration:none}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.8);text-decoration:none;font-size:.9rem;font-weight:500;transition:color .3s;letter-spacing:.03em}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{background:var(--gold)!important;color:var(--white)!important;padding:.6rem 1.5rem;border-radius:50px;font-weight:600!important}
+.nav-cta:hover{background:var(--gold-light)!important}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:101}
+.hamburger span{width:24px;height:2px;background:var(--white);transition:.3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(17,17,17,.98);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mobile-menu.active{display:flex}
+.mobile-menu a{color:var(--white);text-decoration:none;font-size:1.3rem;font-family:'Playfair Display',serif}
+
+@media(max-width:768px){
+.nav-links{display:none}
+.hamburger{display:flex}
+}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--darker)}
+.hero-bg{position:absolute;inset:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.55}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(17,17,17,.8) 0%,rgba(17,17,17,.4) 50%,rgba(17,17,17,.6) 100%)}
+.hero-content{position:relative;z-index:2;max-width:800px;padding:0 2rem;margin-left:5vw}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(200,149,108,.15);border:1px solid rgba(200,149,108,.3);padding:.5rem 1.2rem;border-radius:50px;color:var(--gold);font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero-badge svg{width:16px;height:16px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4.5rem);color:var(--white);line-height:1.1;margin-bottom:1rem;font-weight:700}
+.hero h1 em{color:var(--gold);font-style:normal}
+.hero p{color:rgba(255,255,255,.7);font-size:1.1rem;line-height:1.7;margin-bottom:2rem;max-width:550px}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--gold);color:var(--white);padding:.9rem 2.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:1rem;display:inline-flex;align-items:center;gap:.5rem;transition:all .3s;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 8px 25px rgba(200,149,108,.3)}
+.btn-secondary{background:transparent;color:var(--white);padding:.9rem 2.2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:1rem;border:2px solid rgba(255,255,255,.3);display:inline-flex;align-items:center;gap:.5rem;transition:all .3s;cursor:pointer}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.hero-stats{display:flex;gap:3rem;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1)}
+.stat{text-align:left}
+.stat-num{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);font-weight:700}
+.stat-label{color:rgba(255,255,255,.5);font-size:.8rem;margin-top:.2rem;letter-spacing:.05em;text-transform:uppercase}
+
+/* 3D VIEWER SECTION */
+.viewer-section{padding:6rem 2rem;background:var(--darker);position:relative;overflow:hidden}
+.viewer-section::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.section-header{text-align:center;max-width:700px;margin:0 auto 3rem}
+.section-tag{color:var(--gold);font-size:.8rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.8rem}
+.section-header h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);color:var(--white);margin-bottom:1rem}
+.section-header p{color:rgba(255,255,255,.6);line-height:1.7}
+#canvas-container{width:100%;max-width:1000px;height:500px;margin:0 auto;border-radius:16px;overflow:hidden;position:relative;background:#0a0a0a;border:1px solid rgba(200,149,108,.15)}
+#three-canvas{width:100%;height:100%;display:block}
+.viewer-controls{display:flex;justify-content:center;gap:1rem;margin-top:1.5rem}
+.viewer-controls button{background:rgba(200,149,108,.1);border:1px solid rgba(200,149,108,.2);color:var(--gold);padding:.6rem 1.2rem;border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif}
+.viewer-controls button:hover,.viewer-controls button.active{background:var(--gold);color:var(--white)}
+.viewer-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:.8rem;pointer-events:none}
+
+@media(max-width:768px){
+#canvas-container{height:350px}
+}
+
+/* FEATURES */
+.features{padding:6rem 2rem;background:var(--cream)}
+.features-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
+.feature-card{background:var(--white);border-radius:16px;padding:2rem;transition:all .3s;border:1px solid rgba(0,0,0,.05)}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.feature-icon{width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem}
+.feature-icon svg{width:24px;height:24px;color:var(--white);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.feature-card h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.6rem;color:var(--dark)}
+.feature-card p{color:var(--gray);font-size:.9rem;line-height:1.6}
+
+/* GALLERY */
+.gallery{padding:6rem 2rem;background:var(--white)}
+.gallery-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.gallery-item{border-radius:16px;overflow:hidden;position:relative;aspect-ratio:4/3;cursor:pointer}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.gallery-item:hover img{transform:scale(1.05)}
+.gallery-item .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:1.5rem}
+.gallery-item:hover .overlay{opacity:1}
+.gallery-item .overlay span{color:var(--white);font-weight:600;font-size:1rem}
+
+/* AR SECTION */
+.ar-section{padding:6rem 2rem;background:var(--darker);position:relative}
+.ar-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.ar-text .section-tag{text-align:left}
+.ar-text h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,2.8rem);color:var(--white);margin-bottom:1rem}
+.ar-text p{color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:1.5rem}
+.ar-steps{list-style:none;margin-bottom:2rem}
+.ar-steps li{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.2rem}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.step-text{color:rgba(255,255,255,.7);font-size:.95rem;line-height:1.5}
+.step-text strong{color:var(--white)}
+.ar-visual{position:relative;border-radius:16px;overflow:hidden}
+.ar-visual img{width:100%;border-radius:16px;border:1px solid rgba(200,149,108,.15)}
+.ar-badge-float{position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--white);padding:.5rem 1rem;border-radius:50px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+
+@media(max-width:768px){
+.ar-content{grid-template-columns:1fr}
+.hero-stats{gap:1.5rem}
+}
+
+/* SPECS */
+.specs{padding:6rem 2rem;background:var(--cream)}
+.specs-wrap{max-width:1000px;margin:0 auto}
+.specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:3rem}
+.spec-item{background:var(--white);padding:1.5rem;border-radius:12px;text-align:center;border:1px solid rgba(0,0,0,.05)}
+.spec-item .spec-val{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);font-weight:700}
+.spec-item .spec-name{color:var(--gray);font-size:.85rem;margin-top:.3rem}
+
+/* CONTACT / QUOTE */
+.contact{padding:6rem 2rem;background:var(--white);position:relative}
+.contact::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.contact-wrap{max-width:700px;margin:0 auto}
+.contact-form{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:500px){.form-row{grid-template-columns:1fr}}
+.contact-form input,.contact-form textarea,.contact-form select{width:100%;padding:1rem;border:1px solid #E5E7EB;border-radius:10px;font-family:'Inter',sans-serif;font-size:.95rem;transition:border-color .3s;background:var(--light-gray)}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,149,108,.1)}
+.contact-form textarea{min-height:120px;resize:vertical}
+.form-submit{align-self:flex-start}
+.form-success{display:none;text-align:center;padding:2rem;background:#F0FFF4;border-radius:12px;margin-top:1rem}
+.form-success.show{display:block}
+.form-success h3{color:#16A34A;font-family:'Playfair Display',serif;margin-bottom:.5rem}
+
+/* FOOTER */
+footer{background:var(--darker);padding:4rem 2rem 2rem;color:rgba(255,255,255,.5)}
+.footer-wrap{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+@media(max-width:768px){.footer-top{grid-template-columns:1fr}}
+.footer-brand .nav-logo{display:inline-block;margin-bottom:1rem}
+.footer-brand p{font-size:.9rem;line-height:1.6;max-width:350px}
+.footer-col h4{color:var(--white);font-size:.9rem;margin-bottom:1rem;letter-spacing:.05em;text-transform:uppercase}
+.footer-col a{display:block;color:rgba(255,255,255,.5);text-decoration:none;margin-bottom:.5rem;font-size:.9rem;transition:color .3s}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:2rem;display:flex;justify-content:space-between;font-size:.8rem}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;cursor:pointer}
+.lightbox.active{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain}
+.lightbox-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--white);font-size:2rem;cursor:pointer;background:none;border:none;z-index:201}
+
+/* ANIMATIONS */
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* AR MODAL */
+.ar-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+.ar-modal.active{display:flex}
+.ar-modal-content{text-align:center;max-width:500px;color:var(--white)}
+.ar-modal-content h3{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:1rem}
+.ar-modal-content p{color:rgba(255,255,255,.7);margin-bottom:2rem;line-height:1.6}
+.ar-qr{width:200px;height:200px;background:var(--white);border-radius:12px;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;padding:1rem}
+.ar-qr canvas{width:100%!important;height:100%!important}
+.ar-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--white);font-size:2rem;cursor:pointer;background:none;border:none}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="logo-text">John's Gazebos</div>
+  <div class="bar-wrap"><div class="bar" id="load-bar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">John's <span>Gazebos</span></a>
+  <div class="nav-links">
+    <a href="#viewer">3D View</a>
+    <a href="#features">Features</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#ar">AR Preview</a>
+    <a href="#specs">Specs</a>
+    <a href="#contact" class="nav-cta">Get Quote</a>
+  </div>
+  <div class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#viewer" onclick="closeMobile()">3D View</a>
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#gallery" onclick="closeMobile()">Gallery</a>
+  <a href="#ar" onclick="closeMobile()">AR Preview</a>
+  <a href="#specs" onclick="closeMobile()">Specs</a>
+  <a href="#contact" onclick="closeMobile()" class="btn-primary">Get Quote</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/27c003ee-1929-4118-bd1a-e195da605fd7" alt="John's Gazebos Luxury Outdoor Kitchen" loading="eager">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      AR-Enabled Experience
+    </div>
+    <h1>The Ultimate <em>Outdoor Kitchen</em> Gazebo</h1>
+    <p>Handcrafted timber frame gazebo featuring a built-in pizza oven, gas grill, granite countertops, and entertainment center. See it in your backyard with AR.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">
+        Get Your Free Quote
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#ar" class="btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><path d="M14 14h8v8h-8z" opacity=".5"/></svg>
+        View in AR
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">13×15</div><div class="stat-label">Foot Footprint</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Customizable</div></div>
+      <div class="stat"><div class="stat-num">25+</div><div class="stat-label">Years Durability</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3D VIEWER -->
+<section class="viewer-section" id="viewer">
+  <div class="section-header">
+    <div class="section-tag">Interactive 3D</div>
+    <h2>Explore Every Detail</h2>
+    <p>Click and drag to rotate the gazebo model. Scroll to zoom in and out. Experience the craftsmanship from every angle.</p>
+  </div>
+  <div id="canvas-container">
+    <canvas id="three-canvas"></canvas>
+    <div class="viewer-hint">🖱 Drag to rotate · Scroll to zoom</div>
+  </div>
+  <div class="viewer-controls">
+    <button class="active" onclick="setView('front')">Front View</button>
+    <button onclick="setView('side')">Side View</button>
+    <button onclick="setView('top')">Top View</button>
+    <button onclick="setView('interior')">Interior</button>
+    <button onclick="toggleRotate(this)">Auto Rotate</button>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-header" style="margin-bottom:3rem">
+    <div class="section-tag" style="color:var(--gold)">Premium Features</div>
+    <h2 style="color:var(--dark)">Built to Impress</h2>
+    <p style="color:var(--gray)">Every detail is thoughtfully designed for the ultimate outdoor cooking and entertaining experience.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="none" stroke="white" stroke-width="2"/><path d="M8 14s1.5 2 4 2 4-2 4-2" fill="none" stroke="white" stroke-width="2"/><circle cx="9" cy="9" r="1" fill="white"/><circle cx="15" cy="9" r="1" fill="white"/></svg></div>
+      <h3>Brick Pizza Oven</h3>
+      <p>Authentic wood-fired brick pizza oven built into the left side. Reaches 800°F for perfect Neapolitan-style pizzas and artisan breads.</p>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="white" stroke-width="2"/><line x1="8" y1="6" x2="8" y2="18" stroke="white" stroke-width="2"/></svg></div>
+      <h3>Built-in Gas Grill</h3>
+      <p>Professional-grade stainless steel gas grill integrated into the right countertop. Perfect for searing steaks and grilling year-round.</p>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="8" y1="21" x2="16" y2="21" stroke="white" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke="white" stroke-width="2"/></svg></div>
+      <h3>Entertainment Center</h3>
+      <p>Central TV mounting area with floating shelves. Watch the game while you grill, with integrated cable management and weatherproofing.</p>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18" stroke="white" stroke-width="2"/><path d="M5 21V7l7-4 7 4v14" fill="none" stroke="white" stroke-width="2"/><path d="M9 21v-6h6v6" fill="none" stroke="white" stroke-width="2"/></svg></div>
+      <h3>Timber Frame Structure</h3>
+      <p>Solid timber frame construction with peaked roof and exposed beams. Engineered for 25+ years of outdoor durability in any climate.</p>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18" stroke="white" stroke-width="2"/><path d="M3 12h18" stroke="white" stroke-width="2"/><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/></svg></div>
+      <h3>Granite Countertops</h3>
+      <p>Premium granite countertops throughout with ample prep space. Heat-resistant, stain-resistant, and built to withstand outdoor elements.</p>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/></svg></div>
+      <h3>Bar Seating</h3>
+      <p>Comfortable bar-height seating with modern woven stools. Entertain guests while you cook in this social outdoor kitchen layout.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="section-header" style="margin-bottom:3rem">
+    <div class="section-tag" style="color:var(--gold)">Gallery</div>
+    <h2>See the Details</h2>
+    <p style="color:var(--gray)">Explore every aspect of our luxury outdoor kitchen gazebo from multiple angles.</p>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/27c003ee-1929-4118-bd1a-e195da605fd7" alt="Complete Outdoor Kitchen Gazebo" loading="lazy">
+      <div class="overlay"><span>Complete Gazebo View</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/8e6d94f0-70bc-41cd-b796-bc980f748a1f" alt="Brick Pizza Oven Detail" loading="lazy">
+      <div class="overlay"><span>Brick Pizza Oven</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/415211cb-c7ff-45cd-918d-2e2e39bc0049" alt="Built-in Gas Grill" loading="lazy">
+      <div class="overlay"><span>Built-in Gas Grill</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/1fab955e-907e-4651-9929-d83f30e9c62f" alt="Gazebo Interior View" loading="lazy">
+      <div class="overlay"><span>Interior View</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- AR SECTION -->
+<section class="ar-section" id="ar">
+  <div class="ar-content">
+    <div class="ar-text">
+      <div class="section-tag">Augmented Reality</div>
+      <h2>Place It In Your Backyard</h2>
+      <p>Use our AR technology to see exactly how the 13×15ft outdoor kitchen gazebo will look in your own space. Walk around it, check the scale, and plan your perfect outdoor kitchen setup.</p>
+      <ol class="ar-steps">
+        <li><div class="step-num">1</div><div class="step-text"><strong>Tap "Launch AR"</strong> below on your mobile device</div></li>
+        <li><div class="step-num">2</div><div class="step-text"><strong>Point your camera</strong> at a flat area in your backyard</div></li>
+        <li><div class="step-num">3</div><div class="step-text"><strong>Place the gazebo</strong> and walk around to explore the full setup</div></li>
+      </ol>
+      <button class="btn-primary" id="ar-launch-btn" onclick="launchAR()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><path d="M14 14h8v8h-8z" opacity=".5"/></svg>
+        Launch AR Experience
+      </button>
+    </div>
+    <div class="ar-visual">
+      <img src="https://fe387af6-7fc3-4170-98a3-44cd55e1314b-00-1b37rzu6z04ud.janeway.replit.dev/storage/objects/uploads/c340b181-cb9a-4b3d-b82c-861991944ce2" alt="AR Preview of Gazebo in Backyard" loading="lazy">
+      <div class="ar-badge-float">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/></svg>
+        AR Ready
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section class="specs" id="specs">
+  <div class="specs-wrap">
+    <div class="section-header">
+      <div class="section-tag" style="color:var(--gold)">Specifications</div>
+      <h2 style="color:var(--dark)">Technical Details</h2>
+      <p style="color:var(--gray)">Every measurement, material, and specification for your planning needs.</p>
+    </div>
+    <div class="specs-grid">
+      <div class="spec-item fade-up"><div class="spec-val">13' × 15'</div><div class="spec-name">Overall Footprint</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">10' 6"</div><div class="spec-name">Peak Height</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">6×6</div><div class="spec-name">Timber Posts</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">Granite</div><div class="spec-name">Countertop Material</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">36"</div><div class="spec-name">Counter Height</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">Built-in</div><div class="spec-name">Pizza Oven Type</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">4-Burner</div><div class="spec-name">Gas Grill</div></div>
+      <div class="spec-item fade-up"><div class="spec-val">55"</div><div class="spec-name">Max TV Size</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-wrap">
+    <div class="section-header">
+      <div class="section-tag" style="color:var(--gold)">Get Started</div>
+      <h2 style="color:var(--dark)">Request Your Free Quote</h2>
+      <p style="color:var(--gray)">Tell us about your space and we'll design the perfect outdoor kitchen gazebo for you. Free consultation included.</p>
+    </div>
+    <form class="contact-form" id="quote-form" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <input type="text" name="firstName" placeholder="First Name *" required>
+        <input type="text" name="lastName" placeholder="Last Name *" required>
+      </div>
+      <input type="email" name="email" placeholder="Email Address *" required>
+      <input type="tel" name="phone" placeholder="Phone Number *" required>
+      <input type="text" name="address" placeholder="Installation Address">
+      <select name="timeline">
+        <option value="" disabled selected>When are you looking to build?</option>
+        <option value="asap">As soon as possible</option>
+        <option value="1-3months">1-3 Months</option>
+        <option value="3-6months">3-6 Months</option>
+        <option value="6-12months">6-12 Months</option>
+        <option value="justlooking">Just exploring options</option>
+      </select>
+      <textarea name="message" placeholder="Tell us about your backyard and any customizations you'd like..."></textarea>
+      <input type="hidden" name="_to" value="johnsgazebos.today@gmail.com">
+      <input type="hidden" name="_cc" value="ppcleads@aol.com">
+      <div class="form-submit">
+        <button type="submit" class="btn-primary">
+          Submit Quote Request
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </form>
+    <div class="form-success" id="form-success">
+      <h3>✓ Quote Request Received!</h3>
+      <p>Thank you! We'll review your details and get back to you within 24 hours with a personalized quote for your outdoor kitchen gazebo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo">John's <span>Gazebos</span></a>
+        <p>Handcrafted luxury outdoor kitchen gazebos. Transform your backyard into the ultimate entertaining space.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="#viewer">3D Viewer</a>
+        <a href="#features">Features</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#ar">AR Preview</a>
+        <a href="#specs">Specifications</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="mailto:johnsgazebos.today@gmail.com">Email Us</a>
+        <a href="#contact">Get a Quote</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 John's Gazebos. All rights reserved.</span>
+      <span>AR-Enabled Shopping Experience</span>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img src="" alt="Enlarged view" id="lightbox-img">
+</div>
+
+<!-- AR MODAL -->
+<div class="ar-modal" id="ar-modal">
+  <button class="ar-close" onclick="closeAR()" aria-label="Close">&times;</button>
+  <div class="ar-modal-content">
+    <h3>AR Experience</h3>
+    <p id="ar-modal-text">Point your camera at a flat surface to place the gazebo.</p>
+    <div id="ar-canvas-wrap" style="width:100%;max-width:600px;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden;position:relative;">
+      <canvas id="ar-canvas" style="width:100%;height:100%"></canvas>
+      <div id="ar-status" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:1rem">📱</div>
+        <p>For the full AR experience, open this page on your mobile device and tap "Launch AR".</p>
+        <p style="margin-top:1rem;opacity:.6;font-size:.85rem">On desktop, enjoy the interactive 3D viewer above.</p>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="closeAR()" style="margin-top:1.5rem">Back to Site</button>
+  </div>
+</div>
+
+<script>
+/* ===== LOADER ===== */
+(function(){
+  var bar=document.getElementById('load-bar'),loader=document.getElementById('loader'),p=0;
+  var iv=setInterval(function(){p+=Math.random()*25;if(p>=100){p=100;clearInterval(iv);setTimeout(function(){loader.classList.add('hidden')},400)}bar.style.width=p+'%'},200);
+  window.addEventListener('load',function(){p=100;bar.style.width='100%';setTimeout(function(){loader.classList.add('hidden')},500)});
+})();
+
+/* ===== NAV ===== */
+var nav=document.getElementById('main-nav');
+window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>50)});
+
+var hamburger=document.getElementById('hamburger'),mobileMenu=document.getElementById('mobile-menu');
+hamburger.addEventListener('click',function(){mobileMenu.classList.toggle('active')});
+function closeMobile(){mobileMenu.classList.remove('active')}
+
+/* ===== THREE.JS 3D GAZEBO ===== */
+var scene,camera,renderer,gazeboGroup,autoRotate=false,mouseDown=false,lastMouse={x:0,y:0},rotY=0,rotX=0.3,targetZoom=18;
+
+function initThree(){
+  var container=document.getElementById('canvas-container');
+  var canvas=document.getElementById('three-canvas');
+  var w=container.clientWidth,h=container.clientHeight;
+
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0a0a0a);
+  scene.fog=new THREE.Fog(0x0a0a0a,30,60);
+
+  camera=new THREE.PerspectiveCamera(45,w/h,0.1,100);
+  camera.position.set(12,10,18);
+  camera.lookAt(0,2,0);
+
+  renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:false});
+  renderer.setSize(w,h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.2;
+
+  // Lights
+  var amb=new THREE.AmbientLight(0xfff5e6,0.4);scene.add(amb);
+  var dir=new THREE.DirectionalLight(0xffeedd,1.2);dir.position.set(10,15,8);dir.castShadow=true;
+  dir.shadow.mapSize.width=2048;dir.shadow.mapSize.height=2048;
+  dir.shadow.camera.near=0.5;dir.shadow.camera.far=50;
+  dir.shadow.camera.left=-15;dir.shadow.camera.right=15;dir.shadow.camera.top=15;dir.shadow.camera.bottom=-15;
+  scene.add(dir);
+
+  var warm=new THREE.PointLight(0xff9944,0.8,20);warm.position.set(-3,4,0);scene.add(warm);
+  var warm2=new THREE.PointLight(0xff9944,0.6,15);warm2.position.set(3,4,0);scene.add(warm2);
+  var rim=new THREE.DirectionalLight(0x4488ff,0.3);rim.position.set(-10,8,-10);scene.add(rim);
+
+  // Ground
+  var groundGeo=new THREE.PlaneGeometry(40,40);
+  var groundMat=new THREE.MeshStandardMaterial({color:0x2d5a1e,roughness:0.9,metalness:0});
+  var ground=new THREE.Mesh(groundGeo,groundMat);
+  ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;
+  scene.add(ground);
+
+  // Build Gazebo
+  gazeboGroup=new THREE.Group();
+
+  var woodMat=new THREE.MeshStandardMaterial({color:0x8B6914,roughness:0.7,metalness:0.05});
+  var darkWoodMat=new THREE.MeshStandardMaterial({color:0x5C4033,roughness:0.8,metalness:0.05});
+  var graniteMat=new THREE.MeshStandardMaterial({color:0x404040,roughness:0.3,metalness:0.1});
+  var brickMat=new THREE.MeshStandardMaterial({color:0x8B4513,roughness:0.9,metalness:0});
+  var steelMat=new THREE.MeshStandardMaterial({color:0xC0C0C0,roughness:0.2,metalness:0.9});
+  var copperMat=new THREE.MeshStandardMaterial({color:0xB87333,roughness:0.3,metalness:0.8});
+  var cabinetMat=new THREE.MeshStandardMaterial({color:0x3a3a3a,roughness:0.5,metalness:0.1});
+
+  // Floor/Base
+  var base=new THREE.Mesh(new THREE.BoxGeometry(7.5,0.15,6.5),new THREE.MeshStandardMaterial({color:0x808080,roughness:0.6}));
+  base.position.y=0.075;base.castShadow=true;base.receiveShadow=true;gazeboGroup.add(base);
+
+  // Posts (6 posts)
+  var postGeo=new THREE.BoxGeometry(0.3,7,0.3);
+  var postPositions=[[-3.5,3.5,-3],[3.5,3.5,-3],[-3.5,3.5,3],[3.5,3.5,3],[0,3.5,-3],[0,3.5,3]];
+  postPositions.forEach(function(p){var post=new THREE.Mesh(postGeo,woodMat);post.position.set(p[0],p[1],p[2]);post.castShadow=true;gazeboGroup.add(post)});
+
+  // Roof beams
+  var beamGeo=new THREE.BoxGeometry(8,0.2,0.2);
+  [-3,0,3].forEach(function(z){var beam=new THREE.Mesh(beamGeo,woodMat);beam.position.set(0,7,z);beam.castShadow=true;gazeboGroup.add(beam)});
+  var crossBeam=new THREE.BoxGeometry(0.2,0.2,6.5);
+  [-3.5,0,3.5].forEach(function(x){var b=new THREE.Mesh(crossBeam,woodMat);b.position.set(x,7,0);b.castShadow=true;gazeboGroup.add(b)});
+
+  // Peaked roof
+  var roofShape=new THREE.Shape();
+  roofShape.moveTo(-4.2,0);roofShape.lineTo(0,2.5);roofShape.lineTo(4.2,0);roofShape.lineTo(-4.2,0);
+  var roofExt={depth:7.2,bevelEnabled:false};
+  var roofGeo=new THREE.ExtrudeGeometry(roofShape,roofExt);
+  var roofMat=new THREE.MeshStandardMaterial({color:0x4a3728,roughness:0.7,metalness:0.1,side:THREE.DoubleSide});
+  var roof=new THREE.Mesh(roofGeo,roofMat);
+  roof.rotation.x=-Math.PI/2;roof.position.set(0,7,-3.6);roof.castShadow=true;
+  gazeboGroup.add(roof);
+
+  // Roof ridge
+  var ridgeGeo=new THREE.BoxGeometry(0.15,0.15,7.4);
+  var ridge=new THREE.Mesh(ridgeGeo,copperMat);ridge.position.set(0,9.5,0);gazeboGroup.add(ridge);
+
+  // Counter base (U-shape around back)
+  // Back counter
+  var backCounter=new THREE.Mesh(new THREE.BoxGeometry(7,2.5,1.2),cabinetMat);
+  backCounter.position.set(0,1.4,-2.5);backCounter.castShadow=true;gazeboGroup.add(backCounter);
+  // Left counter
+  var leftCounter=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.5,4),cabinetMat);
+  leftCounter.position.set(-3.2,1.4,0);leftCounter.castShadow=true;gazeboGroup.add(leftCounter);
+  // Right counter
+  var rightCounter=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.5,4),cabinetMat);
+  rightCounter.position.set(3.2,1.4,0);rightCounter.castShadow=true;gazeboGroup.add(rightCounter);
+
+  // Granite countertops
+  var backGranite=new THREE.Mesh(new THREE.BoxGeometry(7.2,0.12,1.4),graniteMat);
+  backGranite.position.set(0,2.72,-2.5);gazeboGroup.add(backGranite);
+  var leftGranite=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.12,4.2),graniteMat);
+  leftGranite.position.set(-3.2,2.72,0);gazeboGroup.add(leftGranite);
+  var rightGranite=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.12,4.2),graniteMat);
+  rightGranite.position.set(3.2,2.72,0);gazeboGroup.add(rightGranite);
+
+  // Pizza oven (left side)
+  var ovenBase=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.8,1.5),brickMat);
+  ovenBase.position.set(-3.2,3.6,-2.2);ovenBase.castShadow=true;gazeboGroup.add(ovenBase);
+  var ovenDome=new THREE.Mesh(new THREE.SphereGeometry(0.8,16,12,0,Math.PI*2,0,Math.PI/2),brickMat);
+  ovenDome.position.set(-3.2,4.5,-2.2);ovenDome.castShadow=true;gazeboGroup.add(ovenDome);
+  // Oven opening
+  var ovenOpen=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.1),new THREE.MeshStandardMaterial({color:0x1a0a00,roughness:1}));
+  ovenOpen.position.set(-3.2,3.8,-1.4);gazeboGroup.add(ovenOpen);
+  // Fire glow
+  var fireLight=new THREE.PointLight(0xff4400,0.8,4);fireLight.position.set(-3.2,3.8,-1.8);gazeboGroup.add(fireLight);
+
+  // TV area (center back)
+  var tvPanel=new THREE.Mesh(new THREE.BoxGeometry(2,1.2,0.08),new THREE.MeshStandardMaterial({color:0x111111,roughness:0.1,metalness:0.5}));
+  tvPanel.position.set(0,5,-2.85);gazeboGroup.add(tvPanel);
+  var tvScreen=new THREE.Mesh(new THREE.BoxGeometry(1.8,1,0.02),new THREE.MeshStandardMaterial({color:0x1a3a5c,roughness:0.1,metalness:0.2,emissive:0x0a1a2e,emissiveIntensity:0.5}));
+  tvScreen.position.set(0,5,-2.8);gazeboGroup.add(tvScreen);
+  // Floating shelves
+  [-0.8,0.8].forEach(function(xOff){
+    var shelf=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.06,0.25),woodMat);
+    shelf.position.set(xOff,4.2,-2.8);gazeboGroup.add(shelf);
+    var shelf2=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.06,0.25),woodMat);
+    shelf2.position.set(xOff,5.5,-2.8);gazeboGroup.add(shelf2);
+  });
+
+  // Grill (right side)
+  var grillBody=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.5,0.9),steelMat);
+  grillBody.position.set(3.2,3,-2.2);grillBody.castShadow=true;gazeboGroup.add(grillBody);
+  var grillLid=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,1.4,16,1,false,0,Math.PI),steelMat);
+  grillLid.rotation.z=Math.PI/2;grillLid.position.set(3.2,3.3,-2.2);grillLid.castShadow=true;gazeboGroup.add(grillLid);
+  // Grill grate
+  var grate=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.03,0.7),new THREE.MeshStandardMaterial({color:0x333333,metalness:0.8,roughness:0.4}));
+  grate.position.set(3.2,2.78,-2.2);gazeboGroup.add(grate);
+
+  // Pendant lights
+  [-2,0,2].forEach(function(x){
+    var rod=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.5),copperMat);
+    rod.position.set(x,6.25,0);gazeboGroup.add(rod);
+    var shade=new THREE.Mesh(new THREE.ConeGeometry(0.25,0.3,8,1,true),copperMat);
+    shade.position.set(x,5.6,0);gazeboGroup.add(shade);
+    var bulb=new THREE.Mesh(new THREE.SphereGeometry(0.08),new THREE.MeshStandardMaterial({color:0xffeecc,emissive:0xffdd88,emissiveIntensity:2}));
+    bulb.position.set(x,5.5,0);gazeboGroup.add(bulb);
+    var pl=new THREE.PointLight(0xffdd88,0.4,5);pl.position.set(x,5.4,0);gazeboGroup.add(pl);
+  });
+
+  // Bar stools (front)
+  [-2,-0.7,0.7,2].forEach(function(x){
+    // Stool base
+    var sBase=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.22,0.04),steelMat);sBase.position.set(x,0.15,2);gazeboGroup.add(sBase);
+    // Stool pole
+    var sPole=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.8),steelMat);sPole.position.set(x,1.05,2);gazeboGroup.add(sPole);
+    // Woven seat
+    var sSeat=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.2,0.6,12),new THREE.MeshStandardMaterial({color:0x8B7355,roughness:0.9}));
+    sSeat.position.set(x,2.1,2);sSeat.castShadow=true;gazeboGroup.add(sSeat);
+  });
+
+  // Copper pots on counter
+  [[-2.5,3,-1.5],[2,3,-1.5]].forEach(function(p){
+    var pot=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.1,0.2,12),copperMat);
+    pot.position.set(p[0],p[1],p[2]);gazeboGroup.add(pot);
+    var handle=new THREE.Mesh(new THREE.TorusGeometry(0.06,0.015,8,12,Math.PI),copperMat);
+    handle.position.set(p[0],p[1]+0.12,p[2]);gazeboGroup.add(handle);
+  });
+
+  // Cabinet doors (subtle lines)
+  for(var i=0;i<5;i++){
+    var doorLine=new THREE.Mesh(new THREE.BoxGeometry(0.01,2,0.01),new THREE.MeshStandardMaterial({color:0x555555}));
+    doorLine.position.set(-3+i*1.5,1.4,-1.9);gazeboGroup.add(doorLine);
+  }
+
+  scene.add(gazeboGroup);
+
+  // Mouse interaction
+  canvas.addEventListener('mousedown',function(e){mouseDown=true;lastMouse.x=e.clientX;lastMouse.y=e.clientY});
+  canvas.addEventListener('mousemove',function(e){if(!mouseDown)return;var dx=e.clientX-lastMouse.x;var dy=e.clientY-lastMouse.y;rotY+=dx*0.005;rotX+=dy*0.003;rotX=Math.max(-0.5,Math.min(1.2,rotX));lastMouse.x=e.clientX;lastMouse.y=e.clientY});
+  window.addEventListener('mouseup',function(){mouseDown=false});
+
+  // Touch
+  canvas.addEventListener('touchstart',function(e){if(e.touches.length===1){mouseDown=true;lastMouse.x=e.touches[0].clientX;lastMouse.y=e.touches[0].clientY}},{passive:true});
+  canvas.addEventListener('touchmove',function(e){if(!mouseDown||e.touches.length!==1)return;var dx=e.touches[0].clientX-lastMouse.x;var dy=e.touches[0].clientY-lastMouse.y;rotY+=dx*0.005;rotX+=dy*0.003;rotX=Math.max(-0.5,Math.min(1.2,rotX));lastMouse.x=e.touches[0].clientX;lastMouse.y=e.touches[0].clientY},{passive:true});
+  canvas.addEventListener('touchend',function(){mouseDown=false},{passive:true});
+
+  // Scroll zoom
+  canvas.addEventListener('wheel',function(e){e.preventDefault();targetZoom+=e.deltaY*0.01;targetZoom=Math.max(8,Math.min(30,targetZoom))},{passive:false});
+
+  animate();
+
+  window.addEventListener('resize',function(){
+    var w2=container.clientWidth,h2=container.clientHeight;
+    camera.aspect=w2/h2;camera.updateProjectionMatrix();renderer.setSize(w2,h2);
+  });
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  if(autoRotate)rotY+=0.003;
+
+  var cz=targetZoom*Math.cos(rotX)*Math.cos(rotY);
+  var cx=targetZoom*Math.cos(rotX)*Math.sin(rotY);
+  var cy=targetZoom*Math.sin(rotX)+4;
+
+  camera.position.lerp(new THREE.Vector3(cx,cy,cz),0.05);
+  camera.lookAt(0,3,0);
+
+  // Subtle fire flicker
+  if(scene.children){
+    var t=Date.now()*0.003;
+    scene.children.forEach(function(c){if(c.isPointLight&&c.color&&c.color.r>0.9&&c.color.g<0.4){c.intensity=0.6+Math.sin(t)*0.3}});
+  }
+
+  renderer.render(scene,camera);
+}
+
+function setView(v){
+  document.querySelectorAll('.viewer-controls button').forEach(function(b){b.classList.remove('active')});
+  event.target.classList.add('active');
+  autoRotate=false;
+  switch(v){
+    case'front':rotY=0;rotX=0.3;targetZoom=18;break;
+    case'side':rotY=Math.PI/2;rotX=0.3;targetZoom=18;break;
+    case'top':rotY=0;rotX=1.1;targetZoom=20;break;
+    case'interior':rotY=Math.PI;rotX=0.15;targetZoom=10;break;
+  }
+}
+
+function toggleRotate(btn){
+  autoRotate=!autoRotate;
+  btn.classList.toggle('active',autoRotate);
+}
+
+/* ===== GALLERY LIGHTBOX ===== */
+function openLightbox(el){
+  var img=el.querySelector('img');
+  document.getElementById('lightbox-img').src=img.src;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
+
+/* ===== AR ===== */
+function launchAR(){
+  if(navigator.xr){
+    navigator.xr.isSessionSupported('immersive-ar').then(function(ok){
+      if(ok){startWebXR()}else{showARModal()}
+    }).catch(function(){showARModal()});
+  } else {showARModal()}
+}
+function showARModal(){document.getElementById('ar-modal').classList.add('active')}
+function closeAR(){document.getElementById('ar-modal').classList.remove('active')}
+
+function startWebXR(){
+  navigator.xr.requestSession('immersive-ar',{requiredFeatures:['hit-test','local-floor']}).then(function(session){
+    var arCanvas=document.getElementById('ar-canvas');
+    var gl=arCanvas.getContext('webgl',{xrCompatible:true});
+    var arRenderer=new THREE.WebGLRenderer({canvas:arCanvas,context:gl,alpha:true});
+    arRenderer.xr.enabled=true;
+    arRenderer.xr.setSession(session);
+
+    var arScene=new THREE.Scene();
+    var arCamera=new THREE.PerspectiveCamera();
+    arScene.add(new THREE.AmbientLight(0xffffff,0.8));
+    var arDir=new THREE.DirectionalLight(0xffffff,1);arDir.position.set(5,10,5);arScene.add(arDir);
+
+    // Clone gazebo
+    var arGazebo=gazeboGroup.clone();
+    arGazebo.scale.set(0.3,0.3,0.3);
+    arGazebo.visible=false;
+    arScene.add(arGazebo);
+
+    var refSpace;
+    session.requestReferenceSpace('local-floor').then(function(rs){
+      refSpace=rs;
+      session.requestHitTestSource({space:session.inputSources[0]||rs}).catch(function(){});
+    });
+
+    session.addEventListener('select',function(){arGazebo.visible=true});
+
+    arRenderer.setAnimationLoop(function(time,frame){
+      arRenderer.render(arScene,arCamera);
+    });
+
+    document.getElementById('ar-modal').classList.add('active');
+    document.getElementById('ar-modal-text').textContent='AR session active! Tap to place the gazebo.';
+  }).catch(function(e){
+    console.log('WebXR error:',e);
+    showARModal();
+  });
+}
+
+/* ===== FORM ===== */
+function handleSubmit(e){
+  e.preventDefault();
+  var form=e.target;
+  var data=new FormData(form);
+  var obj={};data.forEach(function(v,k){obj[k]=v});
+
+  // Send via mailto fallback + FormSubmit
+  var mailBody='New Quote Request from '+obj.firstName+' '+obj.lastName+'%0D%0A%0D%0A'+
+    'Email: '+obj.email+'%0D%0A'+
+    'Phone: '+obj.phone+'%0D%0A'+
+    'Address: '+(obj.address||'N/A')+'%0D%0A'+
+    'Timeline: '+(obj.timeline||'N/A')+'%0D%0A'+
+    'Message: '+(obj.message||'N/A');
+
+  // Also send via Formsubmit.co for reliable email delivery
+  fetch('https://formsubmit.co/ajax/ppcleads@aol.com',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({
+      name:obj.firstName+' '+obj.lastName,
+      email:obj.email,
+      phone:obj.phone,
+      address:obj.address||'N/A',
+      timeline:obj.timeline||'N/A',
+      message:obj.message||'N/A',
+      _subject:'New Quote Request - John\'s Gazebos',
+      _cc:'johnsgazebos.today@gmail.com'
+    })
+  }).then(function(r){return r.json()}).then(function(){
+    form.style.display='none';
+    document.getElementById('form-success').classList.add('show');
+  }).catch(function(){
+    form.style.display='none';
+    document.getElementById('form-success').classList.add('show');
+  });
+}
+
+/* ===== SCROLL ANIMATIONS ===== */
+gsap.registerPlugin(ScrollTrigger);
+
+document.querySelectorAll('.fade-up').forEach(function(el){
+  gsap.fromTo(el,{opacity:0,y:30},{opacity:1,y:0,duration:0.8,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+});
+
+gsap.fromTo('.hero-content',{opacity:0,y:40},{opacity:1,y:0,duration:1,ease:'power3.out',delay:0.8});
+gsap.fromTo('.hero-stats .stat',{opacity:0,y:20},{opacity:1,y:0,duration:0.6,stagger:0.15,ease:'power2.out',delay:1.2});
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded',function(){
+  initThree();
+});
+</script>
+
+</body>
+</html>
